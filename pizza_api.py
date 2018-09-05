@@ -3,9 +3,9 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 pizzaDB = [
-            {"name": "tonno", "ingredienten":["tomaat", "kaas", "tonijn"]},
-            {"name": "salami", "ingredienten":["tomaat", "kaas", "salami"]},
-            {"name": "hawaii", "ingredienten":["tomaat", "kaas", "ham", "ananas"]}
+            {"name": "tonno", "ingredienten":["tomaat", "kaas", "tonijn"], "price": 100},
+            {"name": "salami", "ingredienten":["tomaat", "kaas", "salami"], "price": 69},
+            {"name": "hawaii", "ingredienten":["tomaat", "kaas", "ham", "ananas"], "price": 5}
             ]
 
 
@@ -49,6 +49,27 @@ def add_price(name):
     for pizza in pizzaDB:
         if pizza['name'] == name:
             pizza.update({'price': price})
+    return jsonify({'pizzaDB': pizzaDB})
+
+@app.route("/<string:name>", methods=['PUT'])
+def put_pizza(name):
+    resultPizza = []
+    for pizza in pizzaDB:
+        if pizza['name'] == name:
+            resultPizza.append(pizza)
+    resultPizza[0]['name'] = request.json['name']
+    return jsonify({'pizzaDB': pizzaDB})
+
+@app.route("/<string:name>", methods=['DELETE'])
+def del_pizza(name):
+    resultPizza = [pizza for pizza in pizzaDB if pizza['name'] == name]
+    pizzaDB.remove(resultPizza)
+    return jsonify({'pizzaDB': pizzaDB})
+
+@app.route("/<string:name>/update_price", methods=['PUT'])
+def update_price(name):
+    resultPizza = [pizza for pizza in pizzaDB if pizza['name'] == name]
+    resultPizza[0]['price'] = request.json['price']
     return jsonify({'pizzaDB': pizzaDB})
 
 if __name__ == '__main__':
